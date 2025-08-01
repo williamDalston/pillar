@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pillar: Your Daily Foundation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Styles */
+        :root {
+            --journal-color: #f59e0b; /* amber-500 */
+            --stretch-color: #84cc16; /* lime-500 */
+            --strength-color: #ef4444; /* red-500 */
+            --meditate-color: #6366f1; /* indigo-500 */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            transition: background-color 0.5s ease;
+        }
+
+        .pillar-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+        .pillar-card:hover:not(.completed) {
+             transform: translateY(-5px);
+             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .pillar-card.completed {
+            background: rgba(240, 253, 244, 0.8); /* green-50 with opacity */
+        }
+        #pillar-journal { border-left-color: var(--journal-color); }
+        #pillar-stretch { border-left-color: var(--stretch-color); }
+        #pillar-strength { border-left-color: var(--strength-color); }
+        #pillar-meditate { border-left-color: var(--meditate-color); }
+
+        .btn-primary {
+            transition: all 0.3s ease;
+        }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+        }
+        #activity-modal-content {
+            transform: translateY(20px);
+            transition: transform 0.3s ease-in-out;
+        }
+        .modal-overlay.visible #activity-modal-content {
+            transform: translateY(0);
+        }
+
+        .progress-circle {
+            transform: rotate(-90deg);
+        }
+        .progress-circle-bar {
+            transition: stroke-dashoffset 1s linear;
+        }
+        .completion-check {
+            transform: scale(0);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        .pillar-card.completed .completion-check {
+            transform: scale(1);
+        }
+        .main-progress-bar {
+            transition: width 0.5s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Main Container -->
+    <div id="app" class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl sm:text-5xl font-bold text-slate-900">Pillar</h1>
+            <p class="text-lg text-slate-600 mt-2">Your Daily Foundation for Mind & Body.</p>
+        </header>
+
+        <!-- Main Content: Pillar Journey -->
+        <main id="main-journey">
+            <h2 id="dynamic-greeting" class="text-2xl font-semibold mb-4 text-center">Good Morning.</h2>
+            <p class="text-center text-slate-500 mb-6">Choose an activity to begin your day.</p>
+            
+            <!-- Overall Progress Bar -->
+            <div class="w-full bg-white/50 rounded-full h-2.5 mb-8 shadow-inner">
+                <div id="main-progress-bar" class="bg-gradient-to-r from-green-400 to-blue-500 h-2.5 rounded-full main-progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Pillar 1: Journal -->
+                <div id="pillar-journal" class="pillar-card bg-white p-6 rounded-lg shadow-sm" onclick="showPillarOptions('journal')" tabindex="0">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-xl font-semibold">1. The Warm-Up: Journal</h3>
+                            <p class="text-slate-500">3-5 minutes</p>
+                        </div>
+                        <div id="journal-status" class="text-2xl completion-check">✅</div>
+                    </div>
+                </div>
+
+                <!-- Pillar 2: Stretch -->
+                <div id="pillar-stretch" class="pillar-card bg-white p-6 rounded-lg shadow-sm" onclick="showPillarOptions('stretch')" tabindex="0">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-xl font-semibold">2. The Flow: Stretch</h3>
+                            <p class="text-slate-500">10 minutes</p>
+                        </div>
+                         <div id="stretch-status" class="text-2xl completion-check">✅</div>
+                    </div>
+                </div>
+
+                <!-- Pillar 3: Full Body -->
+                <div id="pillar-strength" class="pillar-card bg-white p-6 rounded-lg shadow-sm" onclick="showPillarOptions('strength')" tabindex="0">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-xl font-semibold">3. The Work: Full Body</h3>
+                            <p class="text-slate-500">14 minutes</p>
+                        </div>
+                         <div id="strength-status" class="text-2xl completion-check">✅</div>
+                    </div>
+                </div>
+
+                <!-- Pillar 4: Meditate -->
+                <div id="pillar-meditate" class="pillar-card bg-white p-6 rounded-lg shadow-sm" onclick="showPillarOptions('meditate')" tabindex="0">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-xl font-semibold">4. The Cool-Down: Meditate</h3>
+                            <p class="text-slate-500">12 minutes</p>
+                        </div>
+                         <div id="meditate-status" class="text-2xl completion-check">✅</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Activity Modal -->
+        <div id="activity-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4 hidden" role="dialog" aria-modal="true">
+            <div id="activity-modal-content" class="bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-3xl w-full max-h-[90vh] overflow-y-auto relative">
+                <!-- Content is injected here by JavaScript -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- State Management ---
+        const state = {
+            pillars: {
+                journal: { completed: false },
+                stretch: { completed: false },
+                strength: { completed: false },
+                meditate: { completed: false },
+            },
+            journalEntry: '',
+            journalPrompts: [
+                "What is one thing I am looking forward to today?",
+                "What's a small, achievable goal I can accomplish today?",
+                "Describe something that made you smile yesterday.",
+                "What is one thing I can do today that my future self will thank me for?",
+                "If I had an extra hour today, how would I spend it?",
+                "What's a challenge I'm facing, and what's one small step I can take to address it?",
+                "Who is someone I'm grateful for, and why?",
+            ],
+            strengthRoutine: [
+                { name: 'Jumping Jacks', duration: 30, movement: 'A classic cardio move. Keep a brisk pace.', image: '✳️' },
+                { name: 'Wall Sit', duration: 30, movement: 'Lean against a wall with knees at a 90-degree angle.', image: '🧱' },
+                { name: 'Push-ups', duration: 30, movement: 'Perform standard push-ups. Modify on knees if necessary.', image: '🔽' },
+                { name: 'Abdominal Crunch', duration: 30, movement: 'Lie on your back, knees bent, and lift your shoulders off the floor.', image: '🔥' },
+                { name: 'Step-up onto Chair', duration: 30, movement: 'Step up onto a sturdy chair or bench, alternating legs.', image: '⬆️' },
+                { name: 'Squat', duration: 30, movement: 'Keep your chest up and back straight as you lower your hips.', image: '⬇️' },
+                { name: 'Triceps Dip on Chair', duration: 30, movement: 'With your back to a chair, place hands on the edge and lower your body.', image: '↘️' },
+                { name: 'Plank', duration: 30, movement: 'Hold a straight line from head to heels, engaging your core.', image: '⏳' },
+                { name: 'High Knees Running', duration: 30, movement: 'Run in place, bringing your knees up as high as possible.', image: '💨' },
+                { name: 'Lunge', duration: 30, movement: 'Step forward and lower your hips until both knees are at 90 degrees. Alternate legs.', image: '➡️' },
+                { name: 'Push-up and Rotation', duration: 30, movement: 'Perform a push-up, then rotate your body and extend one arm to the ceiling. Alternate sides.', image: '🔄' },
+                { name: 'Side Plank', duration: 30, movement: 'Support your body on one forearm. Hold for 15s then switch sides.', image: '⏳' },
+            ],
+            currentPrompt: '',
+            currentTimer: null,
+            currentSequence: [],
+            currentExerciseIndex: 0,
+            lastFocusedElement: null,
+        };
+
+        // --- DOM Elements ---
+        const activityModal = document.getElementById('activity-modal');
+        const activityModalContent = document.getElementById('activity-modal-content');
+        const mainProgressBar = document.getElementById('main-progress-bar');
+        const dynamicGreeting = document.getElementById('dynamic-greeting');
+
+        // --- Core Functions ---
+        function init() {
+            loadState();
+            const today = new Date().toDateString();
+            if (localStorage.getItem('lastVisit') !== today) {
+                resetDailyProgress();
+                localStorage.setItem('lastVisit', today);
+            }
+            state.currentPrompt = state.journalPrompts[new Date().getDay()];
+            updateDynamicGreeting();
+            updateUI();
+            addKeyboardListeners();
+        }
+
+        function updateUI() {
+            let completedCount = 0;
+            Object.keys(state.pillars).forEach(pillarKey => {
+                const pillar = state.pillars[pillarKey];
+                const pillarEl = document.getElementById(`pillar-${pillarKey}`);
+                
+                pillarEl.classList.toggle('completed', pillar.completed);
+                if (pillar.completed) completedCount++;
+            });
+            const progressPercentage = (completedCount / 4) * 100;
+            mainProgressBar.style.width = `${progressPercentage}%`;
+        }
+        
+        function showPillarOptions(pillarKey) {
+            if (state.pillars[pillarKey].completed) {
+                if (confirm('You have already completed this. Do you want to do it again?')) {
+                    state.pillars[pillarKey].completed = false;
+                    updateUI();
+                } else {
+                    return;
+                }
+            }
+            
+            state.lastFocusedElement = document.activeElement;
+
+            switch(pillarKey) {
+                case 'journal': startJournal(); break;
+                case 'stretch': startStretch(); break;
+                case 'strength': startStrength(); break;
+                case 'meditate': startMeditation(); break;
+            }
+        }
+
+        function completePillar(pillarKey) {
+            state.pillars[pillarKey].completed = true;
+            closeModal();
+            saveState();
+            updateUI();
+        }
+        
+        function resetDailyProgress() {
+            Object.keys(state.pillars).forEach(key => state.pillars[key].completed = false);
+            state.journalEntry = '';
+            saveState();
+        }
+
+        function openModal(content) {
+            activityModalContent.innerHTML = content;
+            activityModal.classList.remove('hidden');
+            setTimeout(() => activityModal.classList.add('visible'), 10); // For transition
+            const firstFocusable = activityModalContent.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            if (firstFocusable) firstFocusable.focus();
+        }
+
+        function closeModal() {
+            activityModal.classList.remove('visible');
+            setTimeout(() => {
+                activityModal.classList.add('hidden');
+                activityModalContent.innerHTML = '';
+            }, 300);
+
+            if (state.currentTimer) {
+                clearInterval(state.currentTimer);
+                state.currentTimer = null;
+            }
+            const mediaElements = activityModal.querySelectorAll('iframe, audio');
+            mediaElements.forEach(el => {
+                const originalSrc = el.src;
+                el.src = '';
+                el.src = originalSrc;
+            });
+
+            if (state.lastFocusedElement) {
+                state.lastFocusedElement.focus();
+            }
+        }
+        
+        // --- Pillar Specific Functions ---
+        function startJournal() {
+            const content = `
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-3xl font-light" aria-label="Close dialog">&times;</button>
+                <h2 class="text-2xl font-bold mb-4">Daily Journal</h2>
+                <p class="text-slate-600 mb-6">${state.currentPrompt}</p>
+                <textarea id="journal-textarea" class="w-full h-48 border border-slate-300 rounded-md p-4 focus:ring-2 focus:ring-blue-500" placeholder="Your thoughts...">${state.journalEntry}</textarea>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="saveJournal()" class="btn-primary px-6 py-2 rounded-md font-semibold">Save & Complete</button>
+                </div>
+            `;
+            openModal(content);
+            document.getElementById('journal-textarea').focus();
+        }
+
+        function saveJournal() {
+            const textarea = document.getElementById('journal-textarea');
+            state.journalEntry = textarea.value.trim();
+            if (state.journalEntry.length > 0) {
+                 completePillar('journal');
+            } else {
+                alert("Please write a little something to complete your journal entry.");
+            }
+        }
+
+        function startStretch() {
+            const content = `
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-3xl font-light" aria-label="Close dialog">&times;</button>
+                <h2 class="text-2xl font-bold mb-4">10-Minute Full Body Stretch</h2>
+                <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden mb-4">
+                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/g_tea8ZNk5A?autoplay=1&modestbranding=1&rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="completePillar('stretch')" class="btn-primary px-6 py-2 rounded-md font-semibold">Mark as Complete</button>
+                </div>
+            `;
+            openModal(content);
+        }
+
+        function startStrength() {
+            const singleRound = [];
+            state.strengthRoutine.forEach((ex, index) => {
+                singleRound.push(ex);
+                if (index < state.strengthRoutine.length - 1) {
+                    singleRound.push({ name: 'Rest', duration: 5, movement: 'Breathe and prepare for the next exercise.', image: '💧' });
+                }
+            });
+            
+            const fullWorkout = [
+                ...singleRound,
+                { name: 'Mid-Workout Rest', duration: 15, movement: 'Well done! Prepare for Round 2.', image: '🏆' },
+                ...singleRound
+            ];
+
+            state.currentSequence = fullWorkout;
+            runExerciseSequence('strength', '14-Minute Full Body');
+        }
+
+        function runExerciseSequence(pillarKey, title) {
+            state.currentExerciseIndex = 0;
+            showCurrentExercise(pillarKey, title);
+        }
+
+        function showCurrentExercise(pillarKey, title) {
+            if (state.currentExerciseIndex >= state.currentSequence.length) {
+                completePillar(pillarKey);
+                return;
+            }
+
+            const exercise = state.currentSequence[state.currentExerciseIndex];
+            let timeLeft = exercise.duration;
+            const radius = 60;
+            const circumference = 2 * Math.PI * radius;
+
+            const content = `
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-3xl font-light" aria-label="Close dialog">&times;</button>
+                <div class="text-center">
+                    <p class="text-sm font-semibold text-blue-600 uppercase">${title}</p>
+                    <h2 class="text-3xl font-bold mt-2 mb-2">${exercise.name}</h2>
+                    <div class="w-full h-48 flex items-center justify-center my-4 text-8xl">
+                        ${exercise.image}
+                    </div>
+                    <p class="text-slate-500 mb-6 h-12">${exercise.movement}</p>
+                    
+                    <div class="relative w-40 h-40 mx-auto mb-6">
+                        <svg class="w-full h-full progress-circle" viewBox="0 0 140 140">
+                            <circle class="text-slate-200" stroke-width="10" stroke="currentColor" fill="transparent" r="${radius}" cx="70" cy="70"/>
+                            <circle id="progress-bar" class="text-blue-600 progress-circle-bar" stroke-width="10" stroke-dasharray="${circumference}" stroke-dashoffset="0" stroke-linecap="round" stroke="currentColor" fill="transparent" r="${radius}" cx="70" cy="70"/>
+                        </svg>
+                        <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-4xl font-bold text-slate-800">${timeLeft}</div>
+                    </div>
+
+                    <p class="text-slate-500 mb-6">Next up: ${state.currentSequence[state.currentExerciseIndex + 1] ? state.currentSequence[state.currentExerciseIndex + 1].name : 'Finish'}</p>
+
+                    <div class="flex items-center justify-center gap-8">
+                        <button onclick="previousExercise('${pillarKey}', '${title}')" class="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-full" aria-label="Previous exercise">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <button onclick="skipExercise('${pillarKey}', '${title}')" class="text-slate-400 hover:text-slate-600 transition-colors p-2 rounded-full" aria-label="Next exercise">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            openModal(content);
+
+            const timerDisplay = document.getElementById('timer-display');
+            const progressBar = document.getElementById('progress-bar');
+            
+            if (state.currentTimer) clearInterval(state.currentTimer);
+
+            state.currentTimer = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                const progress = (exercise.duration - timeLeft) / exercise.duration;
+                progressBar.style.strokeDashoffset = circumference * (1 - progress);
+
+                if (timeLeft <= 0) {
+                    clearInterval(state.currentTimer);
+                    state.currentExerciseIndex++;
+                    showCurrentExercise(pillarKey, title);
+                }
+            }, 1000);
+        }
+
+        function skipExercise(pillarKey, title) {
+            if (state.currentTimer) clearInterval(state.currentTimer);
+            state.currentExerciseIndex++;
+            showCurrentExercise(pillarKey, title);
+        }
+
+        function previousExercise(pillarKey, title) {
+            if (state.currentTimer) clearInterval(state.currentTimer);
+            if (state.currentExerciseIndex > 0) {
+                state.currentExerciseIndex--;
+                showCurrentExercise(pillarKey, title);
+            }
+        }
+
+        function startMeditation() {
+            const content = `
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-3xl font-light" aria-label="Close dialog">&times;</button>
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold mb-4">Preparing for Meditation</h2>
+                    <p class="text-slate-600 mb-8">Get comfortable. The session will begin shortly.</p>
+                    <div id="countdown-display" class="text-8xl font-bold text-blue-600">3</div>
+                </div>
+            `;
+            openModal(content);
+
+            let countdown = 3;
+            const countdownDisplay = document.getElementById('countdown-display');
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    countdownDisplay.textContent = countdown;
+                } else {
+                    clearInterval(countdownInterval);
+                    runMeditation();
+                }
+            }, 1000);
+        }
+
+        function runMeditation() {
+            let timeLeft = 12 * 60;
+            const startSound = new Audio('https://cdn.pixabay.com/download/audio/2021/08/04/audio_bb630cc098.mp3');
+            const endSound = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_c3b9c0b5b3.mp3');
+            
+            const content = `
+                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-3xl font-light" aria-label="Close dialog">&times;</button>
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold mb-4">12-Minute Meditation</h2>
+                    <p class="text-slate-600 mb-8">Breathe deeply. The session will end with a chime.</p>
+                    <div class="relative w-48 h-48 mx-auto mb-8">
+                        <div class="animate-pulse absolute inset-0 bg-blue-100 rounded-full"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                             <div id="timer-display" class="text-4xl font-bold text-slate-800">12:00</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            openModal(content);
+            startSound.play().catch(e => console.error("Audio play failed:", e));
+            
+            const timerDisplay = document.getElementById('timer-display');
+            if (state.currentTimer) clearInterval(state.currentTimer);
+            
+            state.currentTimer = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(state.currentTimer);
+                    endSound.play().catch(e => console.error("Audio play failed:", e));
+                    setTimeout(() => completePillar('meditate'), 1500);
+                }
+            }, 1000);
+        }
+        
+        // --- Utility & Accessibility Functions ---
+        function updateDynamicGreeting() {
+            const hour = new Date().getHours();
+            if (hour < 12) {
+                dynamicGreeting.textContent = 'Good Morning.';
+            } else if (hour < 18) {
+                dynamicGreeting.textContent = 'Good Afternoon.';
+            } else {
+                dynamicGreeting.textContent = 'Good Evening.';
+            }
+        }
+
+        function addKeyboardListeners() {
+            document.addEventListener('keydown', (e) => {
+                // Allow activating cards with Enter/Space
+                if ((e.key === 'Enter' || e.key === ' ') && document.activeElement.classList.contains('pillar-card')) {
+                    e.preventDefault();
+                    document.activeElement.click();
+                }
+                // Allow closing modal with Escape
+                if (e.key === 'Escape' && !activityModal.classList.contains('hidden')) {
+                    closeModal();
+                }
+            });
+        }
+
+        // --- Local Storage Persistence ---
+        function saveState() {
+            try {
+                localStorage.setItem('pillarAppState', JSON.stringify(state));
+            } catch (e) {
+                console.error("Failed to save state to localStorage:", e);
+            }
+        }
+
+        function loadState() {
+            try {
+                const savedState = localStorage.getItem('pillarAppState');
+                if (savedState) {
+                    const loaded = JSON.parse(savedState);
+                    if (loaded.pillars) {
+                        state.pillars = loaded.pillars;
+                    }
+                    state.journalEntry = loaded.journalEntry || '';
+                }
+            } catch (e) {
+                console.error("Failed to load state from localStorage:", e);
+            }
+        }
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
