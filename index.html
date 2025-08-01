@@ -135,6 +135,58 @@
             opacity: 0.7;
             pointer-events: none;
         }
+        
+        /* Progress analytics */
+        .progress-stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Better animations */
+        .pillar-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .pillar-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Haptic feedback simulation */
+        .haptic-feedback {
+            animation: haptic-pulse 0.1s ease-out;
+        }
+        
+        @keyframes haptic-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.98); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Better focus indicators */
+        .pillar-card:focus-visible {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+            transform: translateY(-1px);
+        }
+        
+        /* Loading spinner */
+        .loading-spinner {
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -262,6 +314,9 @@
             <div class="skip-exercise"></div>
             <div class="text-red-500 text-sm mt-2"></div>
             <div class="audio-loading"></div>
+            <div class="progress-stats"></div>
+            <div class="haptic-feedback"></div>
+            <div class="loading-spinner"></div>
             <div class="btn-primary px-6 py-2 rounded-md font-semibold"></div>
             <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden mb-4"></div>
             <div class="w-full h-full"></div>
@@ -293,12 +348,14 @@
         // --- State Management ---
         const state = {
             pillars: {
-                journal: { completed: false },
-                stretch: { completed: false },
-                strength: { completed: false },
-                meditate: { completed: false },
+                journal: { completed: false, startTime: null, endTime: null },
+                stretch: { completed: false, startTime: null, endTime: null },
+                strength: { completed: false, startTime: null, endTime: null },
+                meditate: { completed: false, startTime: null, endTime: null },
             },
             journalEntry: '',
+            sessionStartTime: null,
+            totalSessionTime: 0,
             journalPrompts: [
                 // Monday - Energy & Intentions
                 "What is one thing I am looking forward to today?",
@@ -511,16 +568,72 @@
         }
 
         function completePillar(pillarKey) {
-            state.pillars[pillarKey].completed = true;
-            closeModal();
-            saveState();
-            updateUI();
+            try {
+                state.pillars[pillarKey].completed = true;
+                state.pillars[pillarKey].endTime = new Date().toISOString();
+                
+                // Calculate session time
+                if (state.pillars[pillarKey].startTime) {
+                    const startTime = new Date(state.pillars[pillarKey].startTime);
+                    const endTime = new Date(state.pillars[pillarKey].endTime);
+                    const duration = Math.round((endTime - startTime) / 1000); // seconds
+                    state.pillars[pillarKey].duration = duration;
+                }
+                
+                saveState();
+                updateUI();
+                closeModal();
+                
+                // Add haptic feedback
+                const pillarCard = document.getElementById(`pillar-${pillarKey}`);
+                if (pillarCard) {
+                    pillarCard.classList.add('haptic-feedback');
+                    setTimeout(() => pillarCard.classList.remove('haptic-feedback'), 100);
+                }
+                
+                // Check if all pillars are completed
+                const allCompleted = Object.values(state.pillars).every(pillar => pillar.completed);
+                if (allCompleted) {
+                    showCompletionMessage();
+                }
+            } catch (error) {
+                console.error('Error completing pillar:', error);
+            }
         }
         
         function resetDailyProgress() {
-            Object.keys(state.pillars).forEach(key => state.pillars[key].completed = false);
+            Object.keys(state.pillars).forEach(key => {
+                state.pillars[key].completed = false;
+                state.pillars[key].startTime = null;
+                state.pillars[key].endTime = null;
+                state.pillars[key].duration = null;
+            });
             state.journalEntry = '';
+            state.sessionStartTime = null;
+            state.totalSessionTime = 0;
             saveState();
+        }
+        
+        function showCompletionMessage() {
+            // Calculate total session time
+            const completedPillars = Object.values(state.pillars).filter(pillar => pillar.completed && pillar.duration);
+            const totalTime = completedPillars.reduce((sum, pillar) => sum + pillar.duration, 0);
+            const minutes = Math.floor(totalTime / 60);
+            const seconds = totalTime % 60;
+            
+            const content = `
+                <div class="text-center">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h2 class="text-2xl font-bold mb-2">Daily Foundation Complete!</h2>
+                    <p class="text-slate-600 mb-4">You've built a strong foundation for your day.</p>
+                    <div class="progress-stats">
+                        <p class="text-sm opacity-90">Total Session Time</p>
+                        <p class="text-2xl font-bold">${minutes}:${seconds < 10 ? '0' : ''}${seconds}</p>
+                    </div>
+                    <button onclick="closeModal()" class="btn-primary px-6 py-3 rounded-md font-semibold mt-4">Continue with Your Day</button>
+                </div>
+            `;
+            openModal(content);
         }
 
         function openModal(content) {
@@ -570,6 +683,9 @@
         
         // --- Pillar Specific Functions ---
         function startJournal() {
+            // Track start time
+            state.pillars.journal.startTime = new Date().toISOString();
+            
             const content = `
                 <button onclick="closeModal()" class="absolute top-2 right-2 text-slate-400 hover:text-slate-600 text-2xl font-light" aria-label="Close dialog">&times;</button>
                 <h2 class="text-xl sm:text-2xl font-bold mb-3">Daily Journal</h2>
@@ -627,6 +743,9 @@
         }
 
         function startStretch() {
+            // Track start time
+            state.pillars.stretch.startTime = new Date().toISOString();
+            
             const content = `
                 <button onclick="closeModal()" class="absolute top-2 right-2 text-slate-400 hover:text-slate-600 text-2xl font-light" aria-label="Close dialog">&times;</button>
                 <h2 class="text-xl sm:text-2xl font-bold mb-3">10-Minute Full Body Stretch</h2>
@@ -641,6 +760,9 @@
         }
 
         function startStrength() {
+            // Track start time
+            state.pillars.strength.startTime = new Date().toISOString();
+            
             const singleRound = [];
             state.strengthRoutine.forEach((ex, index) => {
                 singleRound.push(ex);
@@ -745,6 +867,9 @@
         }
 
         function startMeditation() {
+            // Track start time
+            state.pillars.meditate.startTime = new Date().toISOString();
+            
             const content = `
                 <button onclick="closeModal()" class="absolute top-2 right-2 text-slate-400 hover:text-slate-600 text-2xl font-light" aria-label="Close dialog">&times;</button>
                 <div class="text-center">
@@ -770,8 +895,16 @@
 
         function runMeditation() {
             let timeLeft = 12 * 60;
+            
+            // Preload audio for better performance
             const startSound = new Audio('https://cdn.pixabay.com/download/audio/2021/08/04/audio_bb630cc098.mp3');
             const endSound = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_c3b9c0b5b3.mp3');
+            
+            // Set audio properties for better compatibility
+            startSound.preload = 'auto';
+            endSound.preload = 'auto';
+            startSound.volume = 0.5;
+            endSound.volume = 0.5;
             
             const content = `
                 <button onclick="closeModal()" class="absolute top-2 right-2 text-slate-400 hover:text-slate-600 text-2xl font-light" aria-label="Close dialog">&times;</button>
@@ -854,6 +987,24 @@
             document.addEventListener('focusin', (e) => {
                 if (e.target.closest('#activity-modal')) {
                     state.lastFocusedElement = e.target;
+                }
+            });
+            
+            // Touch gesture support for mobile
+            let touchStartY = 0;
+            let touchEndY = 0;
+            
+            document.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+            });
+            
+            document.addEventListener('touchend', (e) => {
+                touchEndY = e.changedTouches[0].clientY;
+                const swipeDistance = touchStartY - touchEndY;
+                
+                // Swipe down to close modal (if modal is open)
+                if (swipeDistance > 50 && !activityModal.classList.contains('hidden')) {
+                    closeModal();
                 }
             });
         }
