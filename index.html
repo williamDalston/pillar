@@ -74,6 +74,24 @@
         .modal-overlay.visible #activity-modal-content {
             transform: translateY(0);
         }
+        
+        /* Ensure textarea is properly sized */
+        #journal-textarea {
+            min-height: 200px;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+        
+        /* Ensure modal content is properly visible */
+        #activity-modal-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            max-width: 48rem;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
 
         .progress-circle {
             transform: rotate(-90deg);
@@ -183,6 +201,7 @@
             <div class="flex-1"></div>
             <div class="ml-4 px-3 py-1 text-sm bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"></div>
             <div class="w-full h-48 border border-slate-300 rounded-md p-4 focus:ring-2 focus:ring-blue-500"></div>
+            <div class="w-full h-64 border border-slate-300 rounded-md p-4 focus:ring-2 focus:ring-blue-500 resize-none"></div>
             <div class="mt-6 flex justify-end"></div>
             <div class="btn-primary px-6 py-2 rounded-md font-semibold"></div>
             <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden mb-4"></div>
@@ -474,7 +493,7 @@
                     <p class="text-slate-600 flex-1">${state.currentPrompt}</p>
                     <button onclick="getNewPrompt()" class="ml-4 px-3 py-1 text-sm bg-slate-100 hover:bg-slate-200 rounded-md transition-colors">New Prompt</button>
                 </div>
-                <textarea id="journal-textarea" class="w-full h-48 border border-slate-300 rounded-md p-4 focus:ring-2 focus:ring-blue-500" placeholder="Your thoughts...">${state.journalEntry}</textarea>
+                <textarea id="journal-textarea" class="w-full h-64 border border-slate-300 rounded-md p-4 focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Your thoughts..." style="min-height: 200px;">${state.journalEntry}</textarea>
                 <div class="mt-6 flex justify-end">
                     <button onclick="saveJournal()" class="btn-primary px-6 py-2 rounded-md font-semibold">Save & Complete</button>
                 </div>
