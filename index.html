@@ -187,6 +187,25 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Better modal sizing control */
+        #activity-modal-content {
+            min-width: 280px;
+            max-width: 90vw;
+            width: 320px;
+        }
+        
+        @media (min-width: 640px) {
+            #activity-modal-content {
+                width: 384px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            #activity-modal-content {
+                width: 448px;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -259,7 +278,7 @@
 
         <!-- Activity Modal -->
         <div id="activity-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 hidden" role="dialog" aria-modal="true">
-            <div id="activity-modal-content" class="bg-white rounded-lg shadow-xl p-2 sm:p-3 md:p-4 max-w-sm sm:max-w-md w-full max-h-[70vh] overflow-y-auto relative">
+            <div id="activity-modal-content" class="bg-white rounded-lg shadow-xl p-2 sm:p-3 md:p-4 w-80 sm:w-96 md:w-[28rem] max-w-[90vw] max-h-[70vh] overflow-y-auto relative">
                 <!-- Content is injected here by JavaScript -->
             </div>
         </div>
@@ -306,6 +325,8 @@
             <div class="max-h-[75vh]"></div>
             <div class="max-w-sm sm:max-w-md"></div>
             <div class="max-h-[70vh]"></div>
+            <div class="w-80 sm:w-96 md:w-[28rem]"></div>
+            <div class="max-w-[90vw]"></div>
             <div class="h-48 sm:h-56"></div>
             <div class="text-sm sm:text-base"></div>
             <div class="px-2 py-1"></div>
