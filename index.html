@@ -87,9 +87,7 @@
             background-color: white;
             border-radius: 0.5rem;
             box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-            max-width: 48rem;
             width: 100%;
-            max-height: 90vh;
             overflow-y: auto;
         }
 
@@ -220,6 +218,18 @@
             <div class="gap-2 sm:gap-4"></div>
             <div class="max-w-lg"></div>
             <div class="max-h-[75vh]"></div>
+            <div class="h-48 sm:h-56"></div>
+            <div class="text-sm sm:text-base"></div>
+            <div class="px-2 py-1"></div>
+            <div class="text-xs sm:text-sm"></div>
+            <div class="p-3"></div>
+            <div class="px-4 py-2"></div>
+            <div class="text-sm"></div>
+            <div class="mb-3"></div>
+            <div class="mt-4"></div>
+            <div class="w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40"></div>
+            <div class="text-xl sm:text-2xl md:text-3xl"></div>
+            <div class="mb-3 sm:mb-4"></div>
             <div class="mt-6 flex justify-end"></div>
             <div class="btn-primary px-6 py-2 rounded-md font-semibold"></div>
             <div class="aspect-w-16 aspect-h-9 bg-black rounded-lg overflow-hidden mb-4"></div>
@@ -505,15 +515,15 @@
         // --- Pillar Specific Functions ---
         function startJournal() {
             const content = `
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-3xl font-light" aria-label="Close dialog">&times;</button>
-                <h2 class="text-2xl font-bold mb-4">Daily Journal</h2>
-                <div class="flex items-center justify-between mb-6">
-                    <p class="text-slate-600 flex-1">${state.currentPrompt}</p>
-                    <button onclick="getNewPrompt()" class="ml-4 px-3 py-1 text-sm bg-slate-100 hover:bg-slate-200 rounded-md transition-colors">New Prompt</button>
+                <button onclick="closeModal()" class="absolute top-2 right-2 text-slate-400 hover:text-slate-600 text-2xl font-light" aria-label="Close dialog">&times;</button>
+                <h2 class="text-xl sm:text-2xl font-bold mb-3">Daily Journal</h2>
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-slate-600 flex-1 text-sm sm:text-base">${state.currentPrompt}</p>
+                    <button onclick="getNewPrompt()" class="ml-3 px-2 py-1 text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 rounded-md transition-colors">New Prompt</button>
                 </div>
-                <textarea id="journal-textarea" class="w-full h-64 border border-slate-300 rounded-md p-4 focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Your thoughts..." style="min-height: 200px;">${state.journalEntry}</textarea>
-                <div class="mt-6 flex justify-end">
-                    <button onclick="saveJournal()" class="btn-primary px-6 py-2 rounded-md font-semibold">Save & Complete</button>
+                <textarea id="journal-textarea" class="w-full h-48 sm:h-56 border border-slate-300 rounded-md p-3 focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Your thoughts..." style="min-height: 150px;">${state.journalEntry}</textarea>
+                <div class="mt-4 flex justify-end">
+                    <button onclick="saveJournal()" class="btn-primary px-4 py-2 rounded-md font-semibold text-sm">Save & Complete</button>
                 </div>
             `;
             openModal(content);
@@ -541,13 +551,13 @@
 
         function startStretch() {
             const content = `
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-3xl font-light" aria-label="Close dialog">&times;</button>
-                <h2 class="text-2xl font-bold mb-4">10-Minute Full Body Stretch</h2>
-                <div class="relative w-full bg-black rounded-lg overflow-hidden mb-4" style="padding-bottom: 56.25%;">
+                <button onclick="closeModal()" class="absolute top-2 right-2 text-slate-400 hover:text-slate-600 text-2xl font-light" aria-label="Close dialog">&times;</button>
+                <h2 class="text-xl sm:text-2xl font-bold mb-3">10-Minute Full Body Stretch</h2>
+                <div class="relative w-full bg-black rounded-lg overflow-hidden mb-3" style="padding-bottom: 56.25%;">
                     <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/g_tea8ZNk5A?autoplay=1&modestbranding=1&rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
-                <div class="mt-6 flex justify-end">
-                    <button onclick="completePillar('stretch')" class="btn-primary px-6 py-2 rounded-md font-semibold">Mark as Complete</button>
+                <div class="mt-4 flex justify-end">
+                    <button onclick="completePillar('stretch')" class="btn-primary px-4 py-2 rounded-md font-semibold text-sm">Mark as Complete</button>
                 </div>
             `;
             openModal(content);
@@ -659,11 +669,11 @@
 
         function startMeditation() {
             const content = `
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-3xl font-light" aria-label="Close dialog">&times;</button>
+                <button onclick="closeModal()" class="absolute top-2 right-2 text-slate-400 hover:text-slate-600 text-2xl font-light" aria-label="Close dialog">&times;</button>
                 <div class="text-center">
-                    <h2 class="text-2xl font-bold mb-4">Preparing for Meditation</h2>
-                    <p class="text-slate-600 mb-4 sm:mb-6">Get comfortable. The session will begin shortly.</p>
-                    <div id="countdown-display" class="text-6xl sm:text-8xl font-bold text-blue-600">3</div>
+                    <h2 class="text-xl sm:text-2xl font-bold mb-3">Preparing for Meditation</h2>
+                    <p class="text-slate-600 mb-3 sm:mb-4 text-sm">Get comfortable. The session will begin shortly.</p>
+                    <div id="countdown-display" class="text-4xl sm:text-6xl font-bold text-blue-600">3</div>
                 </div>
             `;
             openModal(content);
@@ -687,14 +697,14 @@
             const endSound = new Audio('https://cdn.pixabay.com/download/audio/2022/03/10/audio_c3b9c0b5b3.mp3');
             
             const content = `
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-3xl font-light" aria-label="Close dialog">&times;</button>
+                <button onclick="closeModal()" class="absolute top-2 right-2 text-slate-400 hover:text-slate-600 text-2xl font-light" aria-label="Close dialog">&times;</button>
                 <div class="text-center">
-                    <h2 class="text-2xl font-bold mb-4">12-Minute Meditation</h2>
-                    <p class="text-slate-600 mb-4 sm:mb-6">Breathe deeply. The session will end with a chime.</p>
-                    <div class="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto mb-4 sm:mb-6">
+                    <h2 class="text-xl sm:text-2xl font-bold mb-3">12-Minute Meditation</h2>
+                    <p class="text-slate-600 mb-3 sm:mb-4 text-sm">Breathe deeply. The session will end with a chime.</p>
+                    <div class="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 mx-auto mb-3 sm:mb-4">
                         <div class="animate-pulse absolute inset-0 bg-blue-100 rounded-full"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
-                             <div id="timer-display" class="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800">12:00</div>
+                             <div id="timer-display" class="text-xl sm:text-2xl md:text-3xl font-bold text-slate-800">12:00</div>
                         </div>
                     </div>
                 </div>
